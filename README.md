@@ -1,2 +1,2 @@
 # Truco_FreePascal
-Simple truco game made is free pascal
+Simple truco game made in free pascal
