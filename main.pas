@@ -21,6 +21,8 @@ type
     isManilha : Boolean;
 end;
 
+{TODO: list, queue and stack}
+
 { ===== Utils ===== }
 
 {convert card num to truco base force of the card}
@@ -62,4 +64,5 @@ begin
     else ValueStr := IntToStr(card) + ' ';
   end;
 end;
+
 
