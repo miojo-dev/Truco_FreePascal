@@ -19,14 +19,14 @@ type
     value : integer;
     suit : TSuit;
     isManilha : Boolean;
-and;
+end;
 
 { ===== Utils ===== }
 
 {convert card num to truco base force of the card}
-function NumToForce(v : integer) : integer;
+function NumToForce(card : integer) : integer;
 begin
-  case v of
+  case card of
     4 : Result := 1;
     5 : Result := 2;
     6 : Result := 3;
@@ -49,4 +49,17 @@ begin
     nHearts : SuitStr := 'Hearts [H]';
     nSpades : SuitStr := 'Spades [S]';
     nDiamonds : SuitStr := 'Diamonds [D]';
-end
+end;
+
+{convert card value to the respective string number or face letter}
+function ValueStr(card : integer) : string;
+begin
+  case card of
+    1 : ValueStr := 'A ';
+    10 : ValueStr := 'J ';
+    11 : ValueStr := 'Q ';
+    12 : ValueStr := 'K ';
+    else ValueStr := IntToStr(card) + ' ';
+  end;
+end;
+
