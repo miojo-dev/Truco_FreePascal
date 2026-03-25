@@ -27,17 +27,17 @@ end;
 function NumToForce(card : integer) : integer;
 begin
   case card of
-    4 : Result := 1;
-    5 : Result := 2;
-    6 : Result := 3;
-    7 : Result := 4;
-    10: Result := 5;
-    11: Result := 6;
-    12: Result := 7;
-    1 : Result := 8;
-    2 : Result := 9;
-    3 : Result := 10;
-    else Result := 0;
+    4 : NumToForce := 1;
+    5 : NumToForce := 2;
+    6 : NumToForce := 3;
+    7 : NumToForce := 4;
+    10: NumToForce := 5;
+    11: NumToForce := 6;
+    12: NumToForce := 7;
+    1 : NumToForce := 8;
+    2 : NumToForce := 9;
+    3 : NumToForce := 10;
+    else NumToForce := 0;
   end;
 end;
 
