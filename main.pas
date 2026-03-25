@@ -40,3 +40,13 @@ begin
     else Result := 0;
   end;
 end;
+
+{convert suit to the respective name in string type}
+function SuitStr(n : TSuit) : string;
+begin
+  case n of
+    nClubs : SuitStr := 'Clubs [C]';
+    nHearts : SuitStr := 'Hearts [H]';
+    nSpades : SuitStr := 'Spades [S]';
+    nDiamonds : SuitStr := 'Diamonds [D]';
+end
