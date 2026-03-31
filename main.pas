@@ -96,3 +96,28 @@ begin
     else
         TotalCardForce := NumToForce(c.value);
 end;
+
+{FUNÇÃO POPULAR BARALHO}
+procedure Gera_Baralho(var B:Baralho);
+ var i,j,k:integer;
+ naipes: array[1..4] of string;
+ begin
+  //Adicionar validação se está vazia(opcional)
+    
+	naipes[1] := 'Ouros';
+  naipes[2] := 'Copas';
+  naipes[3] := 'Espadas';
+  naipes[4] := 'Paus';
+  
+  i:=0;
+  for j:= 1 to 4 do
+   begin
+    for k:=1 to 10 do
+     begin
+      B[i].naipe:= naipes[j];
+      B[i].valor:= k;
+      i:= i+1;
+     end;
+   end;
+ end;
+
