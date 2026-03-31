@@ -54,7 +54,7 @@ begin
 end;
 
 {convert card value to the respective string number or face letter}
-function ValueStr(card : integer) : string;
+function FaceStr(card : integer) : string;
 begin
   case card of
     1 : ValueStr := 'A ';
