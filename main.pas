@@ -69,4 +69,10 @@ begin
   end;
 end;
 
-
+{formats the card into a stringwith all the info}
+function CardStr(const c: TCard): string;
+begin
+    CardStr := FaceStr(c.ValueStr) + ' of ' + SuitStr(c.suit);
+    
+    if c.isManilha then CardStr := CardStr + ' *Manilha!*'
+end
