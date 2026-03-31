@@ -75,4 +75,14 @@ begin
     CardStr := FaceStr(c.ValueStr) + ' of ' + SuitStr(c.suit);
     
     if c.isManilha then CardStr := CardStr + ' *Manilha!*'
-end
+end;
+
+function ManilhaForce(n: TSuit): integer;
+begin
+    case n of
+        nClubs := 4;
+        nHearts := 3;
+        nSpades := 2;
+        nDiamonds := 1;
+        end;
+end;
