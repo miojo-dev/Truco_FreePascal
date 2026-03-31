@@ -25,7 +25,7 @@ type
     isManilha : Boolean;
 end;
 
-type Baralho = array[0..MAX_BARALHO-1] of Carta;
+type Baralho = array[0..deckSize-1] of Carta;
 
 {TODO: list, queue and stack}
 
