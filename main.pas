@@ -77,6 +77,7 @@ begin
     if c.isManilha then CardStr := CardStr + ' *Manilha!*'
 end;
 
+{gives more value based on the card suit}
 function ManilhaForce(n: TSuit): integer;
 begin
     case n of
@@ -85,4 +86,13 @@ begin
         nSpades := 2;
         nDiamonds := 1;
         end;
+end;
+
+{total force of the card}
+function TotalCardForce(const c: TCard): integer;
+begin
+    if c.isManilha then 
+        TotalCardForce := 100 + ManilhaForce(c.suit);
+    else
+        TotalCardForce := NumToForce(c.value);
 end;
