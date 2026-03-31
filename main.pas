@@ -1,6 +1,10 @@
 program Truco_Paulista;
 
 {
+feat: feature
+fix: coreção
+refactor: refatorar código
+
 function NameFunction
 
 var nameVar
