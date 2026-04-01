@@ -117,6 +117,8 @@ begin
     end;
 end;
 
+{ ===== Deck ====== }
+
 {Populate Deck Function}
 procedure GenerateDeck(var d:Deck);
  var i,j,k:integer;
