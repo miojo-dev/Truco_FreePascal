@@ -103,17 +103,9 @@ end;
 function NextCardValue(v: integer): integer
 begin
     case v of
-        1 : NextCardValue := 2;
-        2 : NextCardValue := 3;
-        3 : NextCardValue := 4;
-        4 : NextCardValue := 5;
-        5 : NextCardValue := 6;
-        6 : NextCardValue := 7;
         7 : NextCardValue :=  10;
-        10 : NextCardValue := 11;
-        11 : NextCardValue := 12;
         12 : NextCardValue := 1;
-        else NextCardValue := 0;
+        else NextCardValue := v + 1;
     end;
 end;
 
