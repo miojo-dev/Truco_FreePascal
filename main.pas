@@ -25,7 +25,7 @@ type
     isManilha : Boolean;
 end;
 
-type Baralho = array[0..deckSize-1] of Carta;
+type deck = array[0..deckSize-1] of Carta;
 
 {TODO: list, queue and stack}
 
@@ -117,25 +117,24 @@ begin
     end;
 end;
 
-{FUNÇÃO POPULAR BARALHO}
-procedure Gera_Baralho(var B:Baralho);
+{Populate Deck Function}
+procedure GenerateDeck(var d:Deck);
  var i,j,k:integer;
- naipes: array[1..4] of string;
+ suit: array[1..4] of string;
  begin
-  //Adicionar validação se está vazia(opcional)
-    
-	naipes[1] := 'Ouros';
-  naipes[2] := 'Copas';
-  naipes[3] := 'Espadas';
-  naipes[4] := 'Paus';
+	//Adicionar validação se está vazia(opcional)
+	suit[1] := 'Ouros';
+	suit[2] := 'Copas';
+	suit[3] := 'Espadas';
+	suit[4] := 'Paus';
   
   i:=0;
   for j:= 1 to 4 do
    begin
     for k:=1 to 10 do
      begin
-      B[i].naipe:= naipes[j];
-      B[i].valor:= k;
+      d[i].suit:= suit[j];
+      d[i].value:= k;
       i:= i+1;
      end;
    end;
