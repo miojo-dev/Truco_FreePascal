@@ -155,12 +155,31 @@ begin
 	begin
 		for k := 1 to 10 do
         begin
+		 if (k < 8) or (k > 9) then
+		 begin
             d[i].suit := suit[j];
             
 			d[i].value := k;
             
 			i:= i + 1;
+		   end;
 		end;
+	end;
+end;
+{Shuffle Deck Function}
+procedure ShuffleDeck(var d, e:Deck; ds:integer);
+var i, n: integer;
+begin
+ i:=0;
+ while i <= ds-1 do
+  begin
+   n:= random(40);
+   if (d[n].isDrew = false) then
+    begin
+     e[i]:= d[n];
+     d[n].isDrew:= true;
+     i:= i+1;
+    end;
 	end;
 end;
 
