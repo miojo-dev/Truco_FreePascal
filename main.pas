@@ -109,6 +109,27 @@ begin
     end;
 end;
 
+{
+compare two cards
+
+1 = player won
+2 = pc won
+0 = tie
+}
+function CompareCards(const playerCards, pcCards: TCard): integer;
+var playerPower, pcPower: integer;
+begin
+    playerPower := TotalCardForce(playerCards);
+    pcPower := TotalCardForce(pcCards);
+  
+    if playerPower > pcPower then 
+        CompareCards := 1
+    else if pcPower > playerPower then
+        CompareCards := 2
+    else
+        CompareCards := 0;
+end;
+
 { ===== Deck ====== }
 
 {Populate Deck Function}
