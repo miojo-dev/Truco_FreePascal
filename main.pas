@@ -25,7 +25,7 @@ type
     isManilha : Boolean;
 end;
 
-type deck = array[0..deckSize-1] of Carta;
+type deck = array[0..deckSize-1] of TCard;
 
 {TODO: list, queue and stack}
 
