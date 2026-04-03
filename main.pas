@@ -113,24 +113,26 @@ end;
 
 {Populate Deck Function}
 procedure GenerateDeck(var d:Deck);
- var i,j,k:integer;
- suit: array[1..4] of string;
- begin
+var i,j,k:integer;
+suit: array[1..4] of string;
+begin
 	//Adicionar validação se está vazia(opcional)
-	suit[1] := 'Ouros';
-	suit[2] := 'Copas';
-	suit[3] := 'Espadas';
-	suit[4] := 'Paus';
+	suit[1] := 'Diamonds';
+	suit[2] := 'Hearts';
+	suit[3] := 'Spades';
+	suit[4] := 'Clubs';
   
-  i:=0;
-  for j:= 1 to 4 do
-   begin
-    for k:=1 to 10 do
-     begin
-      d[i].suit:= suit[j];
-      d[i].value:= k;
-      i:= i+1;
-     end;
-   end;
- end;
+	i := 0;
+	for j := 1 to 4 do
+	begin
+		for k := 1 to 10 do
+    	begin
+    		d[i].suit := suit[j];
+	  
+			d[i].value := k;
+	  
+			i:= i + 1;
+		end;
+	end;
+end;
 
