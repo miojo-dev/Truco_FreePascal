@@ -19,6 +19,12 @@ const
     handSize  = 3;
 
 type
+    TPlayer = record
+        hand : array[1..3] of TCard;
+        roundPts : double;
+        matchPts : integer;
+    end;
+	
     TSuit = (nClubs, nHearts, nSpades, nDiamonds);
 
     TCard = record
@@ -200,6 +206,21 @@ begin
    f[i]:= e[j];
    i:=i+1;
 	end; 
+end;
+
+{ == Game Logic === }
+
+var 
+    player : TPlayer;
+    pc : TPlayer;
+    
+procedure ShowPlayerHand(const hand: array of TCard)
+var i : integer;
+begin
+    writeln;
+    
+    for i := 1 to 3 do
+        writeln(' - [', i, '] ', CardStr(hand[i]));
 end;
 
 {implementation}
