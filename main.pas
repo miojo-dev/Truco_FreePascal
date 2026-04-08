@@ -183,6 +183,25 @@ begin
 	end;
 end;
 
+procedure CutDeck(var e, f:Deck; ds:integer);
+var i, c, j:integer;
+begin
+ writeln('Cortar Baralho na posição: ');
+ read(c);
+ i:=0;
+ for j:=c to ds-1 do
+  begin
+   f[i]:= e[j];
+   i:=i+1;
+	end;
+ 
+ for j:=0 to c-1 do
+  begin
+   f[i]:= e[j]
+   i:=i+1;
+	end; 
+end;
+
 {implementation}
 begin
     
