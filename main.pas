@@ -197,7 +197,7 @@ begin
  
  for j:=0 to c-1 do
   begin
-   f[i]:= e[j]
+   f[i]:= e[j];
    i:=i+1;
 	end; 
 end;
