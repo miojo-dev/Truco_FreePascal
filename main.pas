@@ -146,7 +146,7 @@ end;
 { ===== Deck ====== }
 
 {Populate Deck Function}
-procedure GenerateDeck(var d:Deck);
+procedure GenerateDeck(var d:Deck; ds:integer; var p: integer);
 var i,j,k:integer;
 suit: array[1..4] of TSuit;
 begin
@@ -159,20 +159,22 @@ begin
 	i := 0;
 	for j := 1 to 4 do
 	begin
-		for k := 1 to 10 do
+		for k := 1 to 12 do
         begin
-		 if (k < 8) or (k > 9) then
-		 begin
+        if (k < 8) or (k > 9) then
+        begin
             d[i].suit := suit[j];
             
 			d[i].value := k;
-            
+      d[i].isDrew:= false;      
 			i:= i + 1;
-		   end;
+			end;
 		end;
 	end;
+	p:= ds;
 end;
-{Shuffle Deck Function}
+
+//IRÁ EMBARALHAR DE FORMA ALEATÓRIA AS CARTAS
 procedure ShuffleDeck(var d, e:Deck; ds:integer);
 var i, n: integer;
 begin
@@ -189,11 +191,11 @@ begin
 	end;
 end;
 
-procedure CutDeck(var e, f:Deck; ds:integer);
+//CORTA O BARALHO DE FORMA ALEATÓRIA E REORGANIZA
+procedure Cut(var e, f:Deck; ds:integer);
 var i, c, j:integer;
 begin
- writeln('Cortar Baralho na posição: ');
- read(c);
+ c:= random(40);
  i:=0;
  for j:=c to ds-1 do
   begin
@@ -205,7 +207,17 @@ begin
   begin
    f[i]:= e[j];
    i:=i+1;
-	end; 
+	end;
+end;
+
+//FUNÇÃO IRÁ COMPRAR UMA CARTA E IRÁ ORGANIZAR A FILA
+function BuyCard(var f:Deck; ds:integer; var p:integer):TCard;
+var i:integer;
+begin
+ BuyCard:=f[0];
+ p:= p-1;
+ for i:= 0 to p-1 do
+    f[i] := f[i+1];
 end;
 
 { == Game Logic === }
