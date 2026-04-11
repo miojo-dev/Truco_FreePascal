@@ -221,8 +221,9 @@ begin
 end;
 
 //FUNÇÃO COMPRA UMA CARTA E DEFINE A MANILHA
-function ViraManilha(f:Deck; var p, Valor:integer ): integer;
+function ViraManilha(f:Deck; var p:integer ): integer;
 var Manilha:TCard;
+Valor:integer;
 begin
  Manilha:= BuyCard(f,p);
  Valor:= NextCardValue(Manilha.value);
