@@ -220,6 +220,18 @@ begin
     f[i] := f[i+1];
 end;
 
+//FUNÇÃO COMPRA UMA CARTA E DEFINE A MANILHA
+function ViraManilha(f:Deck; var p, Valor:integer ): integer;
+var Manilha:TCard;
+begin
+ Manilha:= BuyCard(f,p);
+ Valor:= NextCardValue(Manilha.value);
+ ViraManilha:= Valor;
+ writeln('===================');
+ Writeln('MANILHA É: ', Valor);
+ writeln('===================');
+end;
+
 { == Game Logic === }
 
 var 
