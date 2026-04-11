@@ -258,6 +258,34 @@ begin
 	writeln;
 end;
 
+function ChoosePCCard(var round: integer) : TCard;
+var i, currentCard, nextCard: integer;
+var high, low, mid : TCard;
+
+begin
+    low := pc.hand[1]
+    
+    for i := 1 to 2 do
+    begin
+        currentCard := TotalCardForce(pc.hand[i]);
+        nextCard := TotalCardForce(pc.hand[i + 1]);
+        
+        if currentCard > TotalCardForce(high) then high := pc.hand[i];
+        
+        else if currentCard < TotalCardForce(low) then low := pc.hand[i];
+        
+        else mid := pc.hand[i];
+        
+        
+    end;
+    
+    case round of
+        1: MachineInteligence := high;
+        2: MachineInteligence := low;
+        3: MachineInteligence := mid;
+    end;
+end;
+
 {implementation}
 begin
     
