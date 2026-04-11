@@ -11,7 +11,7 @@ function NameFunction
 
 var nameVar
 
-type TNameTipe
+type TNameType
 }
 
 const
@@ -20,6 +20,7 @@ const
 
 type	
     TSuit = (nClubs, nHearts, nSpades, nDiamonds);
+    TRound = (1, 2, 3);
 
     TCard = record
         value : integer;
@@ -29,8 +30,16 @@ type
 	
     TPlayer = record
         hand : array[1..3] of TCard;
-        roundPts : double;
-        matchPts : integer;
+    end;
+    
+    TGame = record
+		whichRound : TRound;
+		
+        playerRoundPts : double;
+        playerMatchPts : integer;
+        
+        pcRoundPts : double;
+        pcMatchPts : integer;
 end;
 
 type deck = array[0..deckSize-1] of TCard;
@@ -238,6 +247,7 @@ end;
 var 
     player : TPlayer;
     pc : TPlayer;
+	gameManager: TGame;
     
 procedure ShowPlayerHand(const hand: array of TCard);
 var i : integer;
@@ -251,10 +261,11 @@ end;
 procedure ShowScore;
 begin
     writeln;
-    writeln('Score match >> Player: ', player.matchPts, ' | PC: ', pc.matchPts);
-    
+    writeln('Score match >> Player: ', gameManager.playerMatchPts,
+	' | PC: ', gameManager.pcMatchPts);
     writeln;
-    writeln('Score round >> Player: ', player.roundPts, ' | PC: ', pc.roundPts);
+    writeln('Score round >> Player: ', gameManager.playerRoundPts,
+	' | PC: ', gameManager.pcMatchPts);
 	writeln;
 end;
 
