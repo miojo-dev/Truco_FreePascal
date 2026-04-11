@@ -18,19 +18,19 @@ const
     deckSize = 40;
     handSize  = 3;
 
-type
-    TPlayer = record
-        hand : array[1..3] of TCard;
-        roundPts : double;
-        matchPts : integer;
-    end;
-	
+type	
     TSuit = (nClubs, nHearts, nSpades, nDiamonds);
 
     TCard = record
         value : integer;
         suit : TSuit;
         isManilha : Boolean;
+	end;
+	
+    TPlayer = record
+        hand : array[1..3] of TCard;
+        roundPts : double;
+        matchPts : integer;
 end;
 
 type deck = array[0..deckSize-1] of TCard;
@@ -214,13 +214,23 @@ var
     player : TPlayer;
     pc : TPlayer;
     
-procedure ShowPlayerHand(const hand: array of TCard)
+procedure ShowPlayerHand(const hand: array of TCard);
 var i : integer;
 begin
     writeln;
     
     for i := 1 to 3 do
         writeln(' - [', i, '] ', CardStr(hand[i]));
+end;
+
+procedure ShowScore;
+begin
+    writeln;
+    writeln('Score match >> Player: ', player.matchPts, ' | PC: ', pc.matchPts);
+    
+    writeln;
+    writeln('Score round >> Player: ', player.roundPts, ' | PC: ', pc.roundPts);
+	writeln;
 end;
 
 {implementation}
