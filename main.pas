@@ -20,12 +20,12 @@ const
 
 type	
     TSuit = (nClubs, nHearts, nSpades, nDiamonds);
-    TRound = (1, 2, 3);
 
     TCard = record
         value : integer;
         suit : TSuit;
         isManilha : Boolean;
+        isDrew : boolean;
 	end;
 	
     TPlayer = record
@@ -33,7 +33,7 @@ type
     end;
     
     TGame = record
-		whichRound : TRound;
+		whichRound : byte;
 		
         playerRoundPts : double;
         playerMatchPts : integer;
@@ -42,7 +42,7 @@ type
         pcMatchPts : integer;
 end;
 
-type deck = array[0..deckSize-1] of TCard;
+type Deck = array[0..deckSize-1] of TCard;
 
 {TODO: list, queue and stack}
 
@@ -175,7 +175,7 @@ begin
             d[i].suit := suit[j];
             
 			d[i].value := k;
-      d[i].isDrew:= false;      
+            d[i].isDrew:= false;      
 			i:= i + 1;
 			end;
 		end;
@@ -220,7 +220,7 @@ begin
 end;
 
 //FUNÇÃO IRÁ COMPRAR UMA CARTA E IRÁ ORGANIZAR A FILA
-function BuyCard(var f:Deck; ds:integer; var p:integer):TCard;
+function BuyCard(var f:Deck; var p:integer):TCard;
 var i:integer;
 begin
  BuyCard:=f[0];
@@ -234,12 +234,12 @@ function ViraManilha(f:Deck; var p:integer ): integer;
 var Manilha:TCard;
 Valor:integer;
 begin
- Manilha:= BuyCard(f,p);
- Valor:= NextCardValue(Manilha.value);
- ViraManilha:= Valor;
- writeln('===================');
- Writeln('MANILHA É: ', Valor);
- writeln('===================');
+    Manilha:= BuyCard(f,p);
+    Valor:= NextCardValue(Manilha.value);
+    ViraManilha:= Valor;
+    writeln('===================');
+    Writeln('MANILHA É: ', Valor);
+    writeln('===================');
 end;
 
 { == Game Logic === }
@@ -270,20 +270,21 @@ begin
 end;
 
 function ChoosePCCard(var round: integer) : TCard;
-var i, currentCard, nextCard: integer;
+var i, currentCard: integer;
 var high, low, mid : TCard;
 
 begin
-    low := pc.hand[1]
+    high.value := 0;
+    high.suit := nDiamonds;
+    low := pc.hand[1];
     
     for i := 1 to 2 do
     begin
         currentCard := TotalCardForce(pc.hand[i]);
-        nextCard := TotalCardForce(pc.hand[i + 1]);
         
-        if currentCard > TotalCardForce(high) then high := pc.hand[i];
+        if currentCard > TotalCardForce(high) then high := pc.hand[i]
         
-        else if currentCard < TotalCardForce(low) then low := pc.hand[i];
+        else if currentCard < TotalCardForce(low) then low := pc.hand[i]
         
         else mid := pc.hand[i];
         
@@ -291,10 +292,20 @@ begin
     end;
     
     case round of
-        1: MachineInteligence := high;
-        2: MachineInteligence := low;
-        3: MachineInteligence := mid;
+        1: ChoosePCCard := high;
+        2: ChoosePCCard := low;
+        3: ChoosePCCard := mid;
     end;
+end;
+
+function ChooseWinner(round: byte): string;
+var diff: double;
+begin
+    diff := gameManager.playerRoundPts - gameManager.pcRoundPts;
+    
+    if diff >= 0.5 then ChooseWinner := 'You Won!'
+    else if diff <= -0.5  then ChooseWinner := 'You Lost.'
+    else ChooseWinner := 'Tie.';
 end;
 
 {implementation}
