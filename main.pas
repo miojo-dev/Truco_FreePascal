@@ -298,14 +298,34 @@ begin
     end;
 end;
 
-function ChooseWinner(round: byte): string;
+{
+    0 = Tie
+    1 = player Won
+    2 = pc Won
+}
+function ChooseWinner(round: byte): byte;
 var diff: double;
 begin
     diff := gameManager.playerRoundPts - gameManager.pcRoundPts;
     
-    if diff >= 0.5 then ChooseWinner := 'You Won!'
-    else if diff <= -0.5  then ChooseWinner := 'You Lost.'
-    else ChooseWinner := 'Tie.';
+    if round = 3 then
+    begin
+        
+        if diff = 0.5 then ChooseWinner := 1
+        
+        else if diff = -0.5  then ChooseWinner := 2
+        
+        else ChooseWinner := 0;
+    end 
+    else if round = 2 then
+    begin
+        
+        if diff = 2.5 then ChooseWinner := 1
+        
+        else if diff = -2.5  then ChooseWinner := 2
+        
+        else ChooseWinner := 0;
+    end;
 end;
 
 {implementation}
