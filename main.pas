@@ -44,6 +44,15 @@ end;
 
 type Deck = array[0..deckSize-1] of TCard;
 
+{VARIÁVEIS}
+var 
+	De, Em, Co: Deck;
+    Position, Manilha: integer;
+    Carta: TCard;
+    player : TPlayer;
+    pc : TPlayer;
+	gameManager: TGame;
+
 {TODO: list, queue and stack}
 
 { ===== Utils ===== }
@@ -362,14 +371,6 @@ begin
         else ChooseWinner := 0;
     end;
 end;
-{VARIÁVEIS}
-var 
-	De, Em, Co: Deck;
-    Position, Manilha: integer;
-    Carta: TCard;
-    player : TPlayer;
-    pc : TPlayer;
-	gameManager: TGame;
 {implementation}
 begin
     
