@@ -273,13 +273,16 @@ begin
   else 
    P.hand[i].isManilha := False;
 end;
+//RESETA O ISDREW PARA PODER EMBARALHAR NORMALMENTE.
+procedure ResetDeck(var d: Deck);
+var
+  i: integer;
+begin
+  for i := 0 to deckSize - 1 do
+    d[i].isDrew := false;
+end;
 
 { == Game Logic === }
-
-var 
-    player : TPlayer;
-    pc : TPlayer;
-	gameManager: TGame;
     
 procedure ShowPlayerHand(const hand: array of TCard);
 var i : integer;
@@ -359,7 +362,14 @@ begin
         else ChooseWinner := 0;
     end;
 end;
-
+{VARIÁVEIS}
+var 
+	De, Em, Co: Deck;
+    Position, Manilha: integer;
+    Carta: TCard;
+    player : TPlayer;
+    pc : TPlayer;
+	gameManager: TGame;
 {implementation}
 begin
     
