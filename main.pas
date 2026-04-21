@@ -242,6 +242,38 @@ begin
     writeln('===================');
 end;
 
+//FUNÇÃO PARA JOGAR AS CARTAS PARA CADA JOGADOR
+procedure Distribuir_Carta(var f:Deck; var PL, PC:TPlayer; var p:integer);
+var i, ipl, ipc:integer;
+begin
+ ipl:=1;
+ ipc:=1;
+ for i:=1 to 6 do
+ begin
+  if i mod 2 = 0 then
+   begin
+    PL.hand[ipl]:= BuyCard(f,p);
+    ipl:= ipl + 1;
+	 end
+	else
+	 begin
+	  PC.hand[ipc]:= BuyCard(f,p);
+	  ipc:= ipc+1;
+	 end; 
+ end;
+end;
+
+//FUNCAO PARA VERIFICAR SE ALGUÉM DOS JOGADORES POSSUI MANILHA
+procedure Verifica_Manilha(var P:TPlayer; var Valor:integer);
+var i:integer;
+begin
+ for i:=1 to 3 do
+  if P.hand[i].value = Valor then
+   P.hand[i].isManilha := True
+  else 
+   P.hand[i].isManilha := False;
+end;
+
 { == Game Logic === }
 
 var 
