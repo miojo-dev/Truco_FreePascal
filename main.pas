@@ -33,14 +33,17 @@ type
     end;
     
     TGame = record
-		whichRound : byte;
+		whichround : byte;
+		
+		turnedCard : TCard;
+		currentManilha : integer;
 		
 		roundWeight: integer;
 		
         playerRoundPts : double;
         playerMatchPts : integer;
         
-        pcRoundPts : double;
+        pcroundPts : double;
         pcMatchPts : integer;
 end;
 
@@ -142,25 +145,25 @@ begin
     end;
 end;
 
-{
-compare two cards
+{ compare two cards
+
++0.5 if on first to give the first round advantage
 
 1 = player won
 2 = pc won
 0 = tie
 }
-function CompareCards(const playerCards, pcCards: TCard): integer;
-var playerPower, pcPower: integer;
+function CompareCards(const playerCards, pcCards: TCard): double;
+var playerPower, pcPower, sum: double;
 begin
     playerPower := TotalCardForce(playerCards);
     pcPower := TotalCardForce(pcCards);
-  
-    if playerPower > pcPower then 
-        CompareCards := 1
-    else if pcPower > playerPower then
-        CompareCards := 2
-    else
-        CompareCards := 0;
+        
+    if playerPower > pcPower then sum := 1
+    else if pcPower > playerPower then sum := 2
+    else sum := 0;
+        
+    CompareCards := sum;
 end;
 
 { ===== Deck ====== }
@@ -275,11 +278,11 @@ begin
 end;
 
 //FUNCAO PARA VERIFICAR SE ALGUÉM DOS JOGADORES POSSUI MANILHA
-procedure Verifica_Manilha(var P:TPlayer; var Valor:integer);
+procedure Verifica_Manilha(var P:TPlayer);
 var i:integer;
 begin
  for i:=1 to 3 do
-  if P.hand[i].value = Valor then
+  if P.hand[i].value = gameManager.currentManilha then
    P.hand[i].isManilha := True
   else 
    P.hand[i].isManilha := False;
@@ -301,7 +304,12 @@ begin
     writeln;
     
     for i := 1 to 3 do
-        writeln(' - [', i, '] ', CardStr(hand[i]));
+    begin
+        if hand[i].isDrew = false then
+        begin
+            writeln(' - [', i, '] ', CardStr(hand[i]));
+        end;
+    end;
 end;
 
 procedure ShowScore;
@@ -315,32 +323,29 @@ begin
 	writeln;
 end;
 
-function ChoosePCCard(var round: integer) : TCard;
-var i, currentCard: integer;
-var high, low, mid : TCard;
-
+function ChoosePCcard(var round: integer) : integer;
+var i, currentCard, high, low, mid : integer;
 begin
-    high.value := 0;
-    high.suit := nDiamonds;
-    low := pc.hand[1];
+    high := 0;
+    low := pc.hand[1].value;
     
     for i := 1 to 2 do
     begin
         currentCard := TotalCardForce(pc.hand[i]);
         
-        if currentCard > TotalCardForce(high) then high := pc.hand[i]
+        if currentCard > TotalCardForce(high) then high := pc.hand[i].value
         
-        else if currentCard < TotalCardForce(low) then low := pc.hand[i]
+        else if currentCard < TotalCardForce(low) then low := pc.hand[i].value;
         
-        else mid := pc.hand[i];
+        else mid := pc.hand[i].value;
         
         
     end;
     
     case round of
-        1: ChoosePCCard := high;
-        2: ChoosePCCard := low;
-        3: ChoosePCCard := mid;
+        1: ChoosePCcard := high;
+        2: ChoosePCcard := low;
+        3: ChoosePCcard := mid;
     end;
 end;
 
@@ -352,7 +357,7 @@ end;
 function ChooseWinner(round: byte): byte;
 var diff: double;
 begin
-    diff := gameManager.playerRoundPts - gameManager.pcRoundPts;
+    diff := gameManager.player.roundPts - gameManager.pc.roundPts;
     
     if round = 3 then
     begin
@@ -431,7 +436,7 @@ begin
         repeat
             Write('  Your choice: ');
             ReadLn(choice);
-        until (choice = 1) or ((choice = 2) or (choice = 3);
+        until (choice = 1) or (choice = 2) or (choice = 3);
     
         case choice of
             1:
@@ -463,6 +468,195 @@ begin
             end;
         end;
     end;
+end;
+
+{plays one hand (3 rounds).
+return 1 if player won, 2 if pc won}
+function PlayHand: Integer;
+var
+    handWeight, resp, round, IdxP, IdxC, firstToGo, handWinner : Integer;
+    cardPlayer, cardPc : TCard;
+    isOnTruco: Boolean;
+    choice : String;
+begin
+    handWeight := 1;
+    isOnTruco := False;
+    firstToGo := 1 + Random(2);
+    handWinner := 0;
+
+    WriteLn;
+    WriteLn('========================================');
+    WriteLn('             NEW HAND                   ');
+    WriteLn('========================================');
+
+    {Iron hand rules}
+    if (gameManager.playerMatchPts = 11) and (gameManager.pcMatchPts = 11) then
+    begin
+        WriteLn('  *** IRON HAND both with 11 points ***');
+        WriteLn('  Who wins the round wins the match!');
+        handWeight := 3;
+    end
+    else if gameManager.playerMatchPts = 11 then
+    begin
+        WriteLn('  *** 11 POINT HAND! You are with 11 points***');
+        WriteLn('  If you win the round you win the match! If you lose, the opponent receives 3 points.');
+        WriteLn('');
+        WriteLn('  Turns: ', CardStr(gameManager.turnedCard));
+        ShowPlayerHand(player.hand);
+        WriteLn('');
+        WriteLn('  You want to play this hand?');
+        writeln('       y?  or  n?');
+        repeat
+            Write('  > ');
+            ReadLn(choice);
+        until (choice = 'y') or (choice = 'n');
+            if choice = 'n' then
+            begin
+                WriteLn('  You forfeight, Computer receives 3 points.');
+                gameManager.pcMatchPts := gameManager.pcMatchPts + 3;
+                PlayHand := 2;
+            end;
+            
+        handWeight := 3;
+    end
+    else if gameManager.pcMatchPts = 11 then
+    begin
+        WriteLn('  *** 11 POINT HAND! You are with 11 points***');
+        WriteLn('  Computer decided to play thi hand.');
+        handWeight := 3;
+    end;
+
+    WriteLn('');
+    WriteLn('  Turns: ', CardStr(gameManager.turnedCard));
+    
+    {round loops}
+    round := 0;
+    while (round < 3) and (handWinner = 0) do
+    begin
+        round := round + 1;
+        WriteLn('');
+        WriteLn('  -------- round: ', round, ' --------');
+        ShowPlayerHand(player.hand);
+        ShowScore;
+        
+        { Computer can call Truco before the player (30% chance) }
+        if (not isOnTruco) and (handWeight < 12) and
+           (not ((gameManager.playerMatchPts = 11) or (gameManager.pcMatchPts = 11))) and
+           (Random(10) <= 3) then
+        begin
+            WriteLn('');
+            resp := NegotiateTruco(handWeight, 2);
+            if resp < 0 then
+            begin
+                gameManager.pcMatchPts := gameManager.pcMatchPts - resp;
+                PlayHand := 2;
+            end;
+            handWeight := resp;
+            isOnTruco := True;
+        end;
+        
+    { Player plays card or calls for truco }
+    IdxP := 0;
+    repeat
+        WriteLn;
+        if (not isOnTruco) and (handWeight < 12) and
+            (not ((gameManager.playerMatchPts = 11) or (gameManager.pcMatchPts = 11))) then
+            WriteLn('  Type the card number or T to call for a truco:')
+        else
+            WriteLn('  Type the card number:');
+        Write('  > ');
+        ReadLn(choice);
+            
+        if (choice = 'T') and
+            (not isOnTruco) and (handWeight < 12) and
+            (not ((gameManager.playerMatchPts = 11) or (gameManager.pcMatchPts = 11))) then
+        begin
+            resp := NegotiateTruco(handWeight, 1);
+            
+            if resp < 0 then
+            begin
+                gameManager.playerMatchPts := gameManager.playerMatchPts - resp;
+                PlayHand := 1;
+            end;
+            
+            handWeight := resp;
+            isOnTruco := True;
+            ShowPlayerHand(player.hand);
+        end
+        else
+        begin
+            IdxP := StrToIntDef(choice, 0);
+            if (IdxP < 1) or (IdxP > 3) then
+            begin
+                WriteLn('  You can not do this now, try again.');
+                IdxP := 0;
+            end;
+        end;
+    until IdxP >= 1;
+    
+        player.hand[IdxP].isDrew := true;
+        
+        {Computer chooses}
+        IdxC := ChoosePCcard(round);
+        pc.hand[IdxC].isDrew := true;
+        
+        cardPlayer := player.hand[IdxP];
+        cardPc := pc.hand[IdxC];
+        
+        WriteLn;
+        WriteLn('  You played: ', CardStr(cardPlayer));
+        WriteLn('  PC Played: ', CardStr(cardPc));
+        
+        handWinner := CompareCards(cardPlayer, cardPc);
+        WriteLn;
+        case handWinner of
+            1: begin 
+                WriteLn('  >>> You won the hand!');
+                    
+                gameManager.playerRoundPts := gameManager.playerRoundPts + 1;
+                    
+                if round = 1 then
+                    gameManager.playerRoundPts := gameManager.playerRoundPts + 0.5;
+                    
+                firstToGo := 1;
+            end;
+            
+            2: begin 
+                WriteLn('  >>> Computer won the hand!');
+                    
+                gameManager.pcRoundPts := gameManager.pcRoundPts + 1;
+                    
+                if round = 1 then
+                    gameManager.pcRoundPts := gameManager.pcRoundPts + 0.5;
+                    
+                firstToGo := 2;
+            end;
+            
+            0: WriteLn('  >>> Hand ended as a Tie!');
+        end;
+            
+        if round >= 2 then
+            handWinner := ChooseWinner(round);
+    end;
+        
+    if handWinner = 0 then
+        handWinner := ChooseWinner(round);
+        
+    WriteLn('');
+    WriteLn('  ====================================');
+    if handWinner = 1 then
+    begin
+        WriteLn('  YOU WON THI HAND!  +', handWeight, ' point(s)');
+        Inc(gameManager.playerMatchPts, handWeight);
+    end
+    else
+    begin
+    WriteLn('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
+    Inc(gameManager.pcRoundPts, handWeight);
+  end;
+  WriteLn('  ====================================');
+
+  PlayHand := handWinner;
 end;
 
 {implementation}
