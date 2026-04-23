@@ -22,7 +22,7 @@ type
     TSuit = (nClubs, nHearts, nSpades, nDiamonds);
 
     TCard = record
-        value : integer;
+        weight : integer;
         suit : TSuit;
         isManilha : Boolean;
         isDrew : boolean;
@@ -41,10 +41,10 @@ type
 		roundWeight: integer;
 		
         playerRoundPts : double;
-        playerMatchPts : integer;
+        playerMatchPts : double;
         
         pcroundPts : double;
-        pcMatchPts : integer;
+        pcMatchPts : double;
 end;
 
 type Deck = array[0..deckSize-1] of TCard;
@@ -91,7 +91,7 @@ begin
     end;
 end;
 
-{convert card value to the respective string number or face letter}
+{convert card weight to the respective string number or face letter}
 function FaceStr(card : integer) : string;
 begin
     case card of
@@ -106,12 +106,12 @@ end;
 {formats the card into a stringwith all the info}
 function CardStr(const c: TCard): string;
 begin
-    CardStr := FaceStr(c.value) + ' of ' + SuitStr(c.suit);
+    CardStr := FaceStr(c.weight) + ' of ' + SuitStr(c.suit);
     
     if c.isManilha then CardStr := CardStr + ' *Manilha!*';
 end;
 
-{gives more value based on the card suit}
+{gives more weight based on the card suit}
 function ManilhaForce(n: TSuit): integer;
 begin
     case n of
@@ -131,17 +131,17 @@ begin
     end
     else
     begin
-        TotalCardForce := NumToForce(c.value);
+        TotalCardForce := NumToForce(c.weight);
     end;
 end;
 
 {next card in the sequence}
-function NextCardValue(v: integer): integer;
+function NextCardweight(v: integer): integer;
 begin
     case v of
-        7 : NextCardValue :=  10;
-        12 : NextCardValue := 1;
-        else NextCardValue := v + 1;
+        7 : NextCardweight :=  10;
+        12 : NextCardweight := 1;
+        else NextCardweight := v + 1;
     end;
 end;
 
@@ -153,8 +153,8 @@ end;
 2 = pc won
 0 = tie
 }
-function CompareCards(const playerCards, pcCards: TCard): double;
-var playerPower, pcPower, sum: double;
+function CompareCards(const playerCards, pcCards: TCard): integer;
+var playerPower, pcPower, sum: integer;
 begin
     playerPower := TotalCardForce(playerCards);
     pcPower := TotalCardForce(pcCards);
@@ -188,7 +188,7 @@ begin
         begin
             d[i].suit := suit[j];
             
-			d[i].value := k;
+			d[i].weight := k;
             d[i].isDrew:= false;      
 			i:= i + 1;
 			end;
@@ -249,7 +249,7 @@ var Manilha:TCard;
 Valor:integer;
 begin
     Manilha:= BuyCard(f,p);
-    Valor:= NextCardValue(Manilha.value);
+    Valor:= NextCardweight(Manilha.weight);
     ViraManilha:= Valor;
     writeln('===================');
     Writeln('MANILHA É: ', Valor);
@@ -282,12 +282,12 @@ procedure Verifica_Manilha(var P:TPlayer);
 var i:integer;
 begin
  for i:=1 to 3 do
-  if P.hand[i].value = gameManager.currentManilha then
+  if P.hand[i].weight = gameManager.currentManilha then
    P.hand[i].isManilha := True
   else 
    P.hand[i].isManilha := False;
 end;
-//RESETA O ISDREW PARA PODER EMBARALHAR NORMALMENTE.
+//RESETA O IS DREW PARA PODER EMBARALHAR NORMALMENTE.
 procedure ResetDeck(var d: Deck);
 var
   i: integer;
@@ -324,28 +324,29 @@ begin
 end;
 
 function ChoosePCcard(var round: integer) : integer;
-var i, currentCard, high, low, mid : integer;
+var i, currentCard : integer;
+    high, low, mid : TCard;
 begin
-    high := 0;
-    low := pc.hand[1].value;
+    high.weight := 0;
+    low.weight := pc.hand[1].weight;
     
     for i := 1 to 2 do
     begin
         currentCard := TotalCardForce(pc.hand[i]);
         
-        if currentCard > TotalCardForce(high) then high := pc.hand[i].value
+        if currentCard > TotalCardForce(high) then high.weight := pc.hand[i].weight
         
-        else if currentCard < TotalCardForce(low) then low := pc.hand[i].value;
+        else if currentCard < TotalCardForce(low) then low.weight := pc.hand[i].weight
         
-        else mid := pc.hand[i].value;
+        else mid.weight := pc.hand[i].weight;
         
         
     end;
     
     case round of
-        1: ChoosePCcard := high;
-        2: ChoosePCcard := low;
-        3: ChoosePCcard := mid;
+        1: ChoosePCcard := high.weight;
+        2: ChoosePCcard := low.weight;
+        3: ChoosePCcard := mid.weight;
     end;
 end;
 
@@ -357,7 +358,7 @@ end;
 function ChooseWinner(round: byte): byte;
 var diff: double;
 begin
-    diff := gameManager.player.roundPts - gameManager.pc.roundPts;
+    diff := gameManager.playerRoundPts - gameManager.pcRoundPts;
     
     if round = 3 then
     begin
@@ -474,9 +475,9 @@ end;
 return 1 if player won, 2 if pc won}
 function PlayHand: Integer;
 var
-    handWeight, resp, round, IdxP, IdxC, firstToGo, handWinner : Integer;
+    handWinner, handWeight, resp, round, IdxP, IdxC, firstToGo : Integer;
     cardPlayer, cardPc : TCard;
-    isOnTruco: Boolean;
+    isOnTruco : Boolean;
     choice : String;
 begin
     handWeight := 1;
@@ -647,12 +648,12 @@ begin
     if handWinner = 1 then
     begin
         WriteLn('  YOU WON THI HAND!  +', handWeight, ' point(s)');
-        Inc(gameManager.playerMatchPts, handWeight);
+        gameManager.playerMatchPts := gameManager.playerMatchPts + handWeight;
     end
     else
     begin
     WriteLn('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
-    Inc(gameManager.pcRoundPts, handWeight);
+    gameManager.pcRoundPts := gameManager.pcRoundPts + handWeight;
   end;
   WriteLn('  ====================================');
 
