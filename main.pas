@@ -35,6 +35,8 @@ type
     TGame = record
 		whichRound : byte;
 		
+		roundWeight: integer;
+		
         playerRoundPts : double;
         playerMatchPts : integer;
         
@@ -371,6 +373,98 @@ begin
         else ChooseWinner := 0;
     end;
 end;
+
+function NegotiateTruco(currentWeight, whoCalled : integer) : integer;
+var nextWeight, choice: integer;
+begin
+    if currentWeight < 12 then
+    begin
+        case currentWeight of
+            1: nextWeight := 3;
+            else nextWeight := currentWeight + 3;
+        end;
+        
+        if whoCalled = 1 then
+        {Player called}
+        begin
+            case nextWeight of
+              3 : WriteLn('  >> You called TRUCO!  (proposal: 3 points)');
+              6 : WriteLn('  >> You called for SIX!  (proposal: 6 points)');
+              9 : WriteLn('  >> You called for NINE!  (proposal: 9 points)');
+              12 : WriteLn('  >> You called for TWELVE!  (proposal: 12 points)');
+            end;
+            
+            writeln('Computer  is choosing...');
+            if random(10) <= 70 then
+            begin
+                writeln(' > ACCEPTED! <');
+                writeln;
+                writeln('Now the hand is worth ', nextWeight);
+                
+                NegotiateTruco := nextWeight;
+            end;
+        end
+        else
+        begin
+            WriteLn('  Computer  RAN AWAY! You won! ', currentWeight, ' points(s).');
+            NegotiateTruco := -currentWeight;
+        end;
+      end
+      else
+      begin
+        {Computer called}
+        case nextWeight of
+          3 : WriteLn('  >> Computer called TRUCO!  (proposal: 3 points)');
+          6 : WriteLn('  >> Computer called for SIX!  (proposal: 6 points)');
+          9 : WriteLn('  >> Computer called for NINE!  (proposal: 9 points)');
+          12: WriteLn('  >> Computer called for TWELVE!  (proposal: 12 points)');
+        end;
+        
+        WriteLn('  What do you do?');
+        WriteLn('    > 1 - Accept  (', nextWeight, ' points)');
+        
+        WriteLn('    > 2 - Run   (computer wins ', currentWeight, ' point(s))');
+        
+        if nextWeight < 12 then
+            WriteLn('    > 3 - Call for more (call for ', nextWeight + 3, ' points)');
+            
+        repeat
+            Write('  Your choice: ');
+            ReadLn(choice);
+        until (choice = 1) or ((choice = 2) or (choice = 3);
+    
+        case choice of
+            1:
+            begin
+                WriteLn('  You accept! now this hand worth: ', nextWeight, ' points.');
+                NegotiateTruco := nextWeight;
+            end;
+            
+            2:
+            begin
+                WriteLn('  You ran away! Computer won ', currentWeight, ' point(s).');
+                NegotiateTruco := -currentWeight;
+            end;
+            
+            3:
+            begin
+                WriteLn('  You re-called! Asked for ', nextWeight + 3, ' points...');
+                
+                if Random(10) < 5 then
+                begin
+                    WriteLn('  Computer ACCEPTED the re-call! now this hand worth: ', nextWeight + 3, ' points.');
+                    NegotiateTruco := nextWeight + 3;
+                end
+                else
+                begin
+                    WriteLn('  Computer RAN AWAY from the re-call! You won ', nextWeight, ' point(s).');
+                    NegotiateTruco := -nextWeight;
+                end;
+            end;
+        end;
+    end;
+end;
+
 {implementation}
 begin
     
