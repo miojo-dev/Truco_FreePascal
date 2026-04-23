@@ -652,12 +652,15 @@ begin
     end
     else
     begin
-    WriteLn('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
-    gameManager.pcRoundPts := gameManager.pcRoundPts + handWeight;
-  end;
-  WriteLn('  ====================================');
+	    WriteLn('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
+	    gameManager.pcRoundPts := gameManager.pcRoundPts + handWeight;
+	end;
+  	WriteLn('  ====================================');
+  
+	gameManager.playerRoundPts := 0;
+    gameManager.pcRoundPts := 0;
 
-  PlayHand := handWinner;
+	PlayHand := handWinner;
 end;
 
 {implementation}
