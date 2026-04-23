@@ -51,7 +51,7 @@ type Deck = array[0..deckSize-1] of TCard;
 
 {VARIÁVEIS}
 var 
-	De, Em, Co: Deck;
+	deck, suffled, Co: Deck;
     Position, Manilha: integer;
     Carta: TCard;
     player : TPlayer;
@@ -652,18 +652,67 @@ begin
     end
     else
     begin
-	    WriteLn('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
-	    gameManager.pcRoundPts := gameManager.pcRoundPts + handWeight;
-	end;
-  	WriteLn('  ====================================');
-  
-	gameManager.playerRoundPts := 0;
+        WriteLn('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
+        gameManager.pcRoundPts := gameManager.pcRoundPts + handWeight;
+    end;
+    WriteLn('  ====================================');
+    
+    gameManager.playerRoundPts := 0;
     gameManager.pcRoundPts := 0;
 
-	PlayHand := handWinner;
+    PlayHand := handWinner;
+end;
+
+procedure PrepareHand;
+begin
+    {todo implementar funções de inicialização}
 end;
 
 {implementation}
 begin
-    
+  gameManager.pcMatchPts := 0;
+  gameManager.pcMatchPts := 0;
+  gameManager.pcRoundPts := 0;
+  gameManager.pcRoundPts := 0;
+
+  WriteLn('==========================================');
+  WriteLn('            WELCOME TO TRUCO!             ');
+  WriteLn('==========================================');
+  WriteLn;
+  WriteLn('    Paus [P] > Copas [C] > Espadas [E] > Ouros [O]');
+  WriteLn;
+  WriteLn('  Card forces:');
+  WriteLn('    4 < 5 < 6 < 7 < J < Q < K < A < 2 < 3');
+  WriteLn;
+  WriteLn('  Press ENTER to initiate...');
+  ReadLn;
+
+  while (gameManager.playerMatchPts < 12) and (gameManager.pcMatchPts < 12) do
+  begin
+    PrepareHand;
+    PlayHand;
+    ShowScore;
+
+    if (gameManager.playerMatchPts < 12) and (gameManager.pcMatchPts < 12) then
+    begin
+      WriteLn('');
+      WriteLn('  Press ENTER for the next hand...');
+      ReadLn;
+    end;
+  end;
+
+  WriteLn('');
+  WriteLn('==========================================');
+  if PontosJogador >= 12 then
+    WriteLn('    CONGRATS! YOU WON THE GAME!')
+  else
+    WriteLn('    COMPUTER WON! Try again.');
+  WriteLn('');
+  WriteLn('  Final score board:');
+  WriteLn('    You        : ', gameManager.playerMatchPts, ' points');
+  WriteLn('    Computer   : ', gameManager.pcMatchPts, ' points');
+  WriteLn('==========================================');
+  WriteLn('');
+  WriteLn('  Press any key to exit the program...');
+  ReadKey;
 end.
