@@ -1,6 +1,6 @@
 program Truco_Paulista;
 
-uses SysUtils;
+uses SysUtils, crt;
 
 {
 feat: feature
@@ -41,17 +41,17 @@ type
 		roundWeight: integer;
 		
         playerRoundPts : double;
-        playerMatchPts : double;
+        playerMatchPts : integer;
         
-        pcroundPts : double;
-        pcMatchPts : double;
+        pcRoundPts : double;
+        pcMatchPts : integer;
 end;
 
 type Deck = array[0..deckSize-1] of TCard;
 
 {VARIÁVEIS}
 var 
-	deck, suffled, Co: Deck;
+	d, suffled, Co: Deck;
     Position, Manilha: integer;
     Carta: TCard;
     player : TPlayer;
@@ -252,7 +252,7 @@ begin
     Valor:= NextCardweight(Manilha.weight);
     ViraManilha:= Valor;
     writeln('===================');
-    Writeln('MANILHA É: ', Valor);
+    writeln('THE MANILHA IS: ', Valor);
     writeln('===================');
 end;
 
@@ -318,8 +318,8 @@ begin
     writeln('Score match >> Player: ', gameManager.playerMatchPts,
 	' | PC: ', gameManager.pcMatchPts);
     writeln;
-    writeln('Score round >> Player: ', gameManager.playerRoundPts,
-	' | PC: ', gameManager.pcMatchPts);
+    writeln('Score round >> Player: ', gameManager.playerRoundPts:0:0,
+	' | PC: ', gameManager.pcRoundPts:0:0);
 	writeln;
 end;
 
@@ -339,8 +339,6 @@ begin
         else if currentCard < TotalCardForce(low) then low.weight := pc.hand[i].weight
         
         else mid.weight := pc.hand[i].weight;
-        
-        
     end;
     
     case round of
@@ -394,14 +392,14 @@ begin
         {Player called}
         begin
             case nextWeight of
-              3 : WriteLn('  >> You called TRUCO!  (proposal: 3 points)');
-              6 : WriteLn('  >> You called for SIX!  (proposal: 6 points)');
-              9 : WriteLn('  >> You called for NINE!  (proposal: 9 points)');
-              12 : WriteLn('  >> You called for TWELVE!  (proposal: 12 points)');
+              3 : writeln('  >> You called TRUCO!  (proposal: 3 points)');
+              6 : writeln('  >> You called for SIX!  (proposal: 6 points)');
+              9 : writeln('  >> You called for NINE!  (proposal: 9 points)');
+              12 : writeln('  >> You called for TWELVE!  (proposal: 12 points)');
             end;
             
             writeln('Computer  is choosing...');
-            if random(10) <= 70 then
+            if random(10) <= 7 then
             begin
                 writeln(' > ACCEPTED! <');
                 writeln;
@@ -412,7 +410,7 @@ begin
         end
         else
         begin
-            WriteLn('  Computer  RAN AWAY! You won! ', currentWeight, ' points(s).');
+            writeln('  Computer  RAN AWAY! You won! ', currentWeight, ' points(s).');
             NegotiateTruco := -currentWeight;
         end;
       end
@@ -420,50 +418,50 @@ begin
       begin
         {Computer called}
         case nextWeight of
-          3 : WriteLn('  >> Computer called TRUCO!  (proposal: 3 points)');
-          6 : WriteLn('  >> Computer called for SIX!  (proposal: 6 points)');
-          9 : WriteLn('  >> Computer called for NINE!  (proposal: 9 points)');
-          12: WriteLn('  >> Computer called for TWELVE!  (proposal: 12 points)');
+          3 : writeln('  >> Computer called TRUCO!  (proposal: 3 points)');
+          6 : writeln('  >> Computer called for SIX!  (proposal: 6 points)');
+          9 : writeln('  >> Computer called for NINE!  (proposal: 9 points)');
+          12: writeln('  >> Computer called for TWELVE!  (proposal: 12 points)');
         end;
         
-        WriteLn('  What do you do?');
-        WriteLn('    > 1 - Accept  (', nextWeight, ' points)');
+        writeln('  What do you do?');
+        writeln('    > 1 - Accept  (', nextWeight, ' points)');
         
-        WriteLn('    > 2 - Run   (computer wins ', currentWeight, ' point(s))');
+        writeln('    > 2 - Run   (computer wins ', currentWeight, ' point(s))');
         
         if nextWeight < 12 then
-            WriteLn('    > 3 - Call for more (call for ', nextWeight + 3, ' points)');
+            writeln('    > 3 - Call for more (call for ', nextWeight + 3, ' points)');
             
         repeat
-            Write('  Your choice: ');
-            ReadLn(choice);
+            write('  Your choice: ');
+            readln(choice);
         until (choice = 1) or (choice = 2) or (choice = 3);
     
         case choice of
             1:
             begin
-                WriteLn('  You accept! now this hand worth: ', nextWeight, ' points.');
+                writeln('  You accept! now this hand worth: ', nextWeight, ' points.');
                 NegotiateTruco := nextWeight;
             end;
             
             2:
             begin
-                WriteLn('  You ran away! Computer won ', currentWeight, ' point(s).');
+                writeln('  You ran away! Computer won ', currentWeight, ' point(s).');
                 NegotiateTruco := -currentWeight;
             end;
             
             3:
             begin
-                WriteLn('  You re-called! Asked for ', nextWeight + 3, ' points...');
+                writeln('  You re-called! Asked for ', nextWeight + 3, ' points...');
                 
-                if Random(10) < 5 then
+                if Random(10) <= 5 then
                 begin
-                    WriteLn('  Computer ACCEPTED the re-call! now this hand worth: ', nextWeight + 3, ' points.');
+                    writeln('  Computer ACCEPTED the re-call! now this hand worth: ', nextWeight + 3, ' points.');
                     NegotiateTruco := nextWeight + 3;
                 end
                 else
                 begin
-                    WriteLn('  Computer RAN AWAY from the re-call! You won ', nextWeight, ' point(s).');
+                    writeln('  Computer RAN AWAY from the re-call! You won ', nextWeight, ' point(s).');
                     NegotiateTruco := -nextWeight;
                 end;
             end;
@@ -484,36 +482,37 @@ begin
     isOnTruco := False;
     firstToGo := 1 + Random(2);
     handWinner := 0;
-
-    WriteLn;
-    WriteLn('========================================');
-    WriteLn('             NEW HAND                   ');
-    WriteLn('========================================');
+    
+    clrscr;
+    writeln;
+    writeln('========================================');
+    writeln('             NEW HAND                   ');
+    writeln('========================================');
 
     {Iron hand rules}
     if (gameManager.playerMatchPts = 11) and (gameManager.pcMatchPts = 11) then
     begin
-        WriteLn('  *** IRON HAND both with 11 points ***');
-        WriteLn('  Who wins the round wins the match!');
+        writeln('  *** IRON HAND both with 11 points ***');
+        writeln('  Who wins the round wins the match!');
         handWeight := 3;
     end
     else if gameManager.playerMatchPts = 11 then
     begin
-        WriteLn('  *** 11 POINT HAND! You are with 11 points***');
-        WriteLn('  If you win the round you win the match! If you lose, the opponent receives 3 points.');
-        WriteLn('');
-        WriteLn('  Turns: ', CardStr(gameManager.turnedCard));
+        writeln('  *** 11 POINT HAND! You are with 11 points***');
+        writeln('  If you win the round you win the match! If you lose, the opponent receives 3 points.');
+        writeln;
+        writeln('  Turned card: ', CardStr(gameManager.turnedCard));
         ShowPlayerHand(player.hand);
-        WriteLn('');
-        WriteLn('  You want to play this hand?');
+        writeln;
+        writeln('  You want to play this hand?');
         writeln('       y?  or  n?');
         repeat
-            Write('  > ');
-            ReadLn(choice);
+            write('  > ');
+            readln(choice);
         until (choice = 'y') or (choice = 'n');
             if choice = 'n' then
             begin
-                WriteLn('  You forfeight, Computer receives 3 points.');
+                writeln('  You forfeight, Computer receives 3 points.');
                 gameManager.pcMatchPts := gameManager.pcMatchPts + 3;
                 PlayHand := 2;
             end;
@@ -522,21 +521,22 @@ begin
     end
     else if gameManager.pcMatchPts = 11 then
     begin
-        WriteLn('  *** 11 POINT HAND! You are with 11 points***');
-        WriteLn('  Computer decided to play thi hand.');
+        writeln('  *** 11 POINT HAND! You are with 11 points***');
+        writeln('  Computer decided to play this hand.');
         handWeight := 3;
     end;
 
-    WriteLn('');
-    WriteLn('  Turns: ', CardStr(gameManager.turnedCard));
+    writeln;
+    writeln('  Turned card: ', CardStr(gameManager.turnedCard));
     
     {round loops}
     round := 0;
     while (round < 3) and (handWinner = 0) do
     begin
         round := round + 1;
-        WriteLn('');
-        WriteLn('  -------- round: ', round, ' --------');
+        writeln;
+        writeln('========================================');
+        writeln('  -------- round: ', round, ' --------');
         ShowPlayerHand(player.hand);
         ShowScore;
         
@@ -545,7 +545,7 @@ begin
            (not ((gameManager.playerMatchPts = 11) or (gameManager.pcMatchPts = 11))) and
            (Random(10) <= 3) then
         begin
-            WriteLn('');
+            writeln;
             resp := NegotiateTruco(handWeight, 2);
             if resp < 0 then
             begin
@@ -559,14 +559,14 @@ begin
     { Player plays card or calls for truco }
     IdxP := 0;
     repeat
-        WriteLn;
+        writeln;
         if (not isOnTruco) and (handWeight < 12) and
             (not ((gameManager.playerMatchPts = 11) or (gameManager.pcMatchPts = 11))) then
-            WriteLn('  Type the card number or T to call for a truco:')
+            writeln('  Type the card number or T to call for a truco:')
         else
-            WriteLn('  Type the card number:');
-        Write('  > ');
-        ReadLn(choice);
+            writeln('  Type the card number:');
+        write('  > ');
+        readln(choice);
             
         if (choice = 'T') and
             (not isOnTruco) and (handWeight < 12) and
@@ -589,7 +589,7 @@ begin
             IdxP := StrToIntDef(choice, 0);
             if (IdxP < 1) or (IdxP > 3) then
             begin
-                WriteLn('  You can not do this now, try again.');
+                writeln('  You can not do this now, try again.');
                 IdxP := 0;
             end;
         end;
@@ -604,15 +604,15 @@ begin
         cardPlayer := player.hand[IdxP];
         cardPc := pc.hand[IdxC];
         
-        WriteLn;
-        WriteLn('  You played: ', CardStr(cardPlayer));
-        WriteLn('  PC Played: ', CardStr(cardPc));
+        writeln;
+        writeln('  You played: ', CardStr(cardPlayer));
+        writeln('  PC Played: ', CardStr(cardPc));
         
         handWinner := CompareCards(cardPlayer, cardPc);
-        WriteLn;
+        writeln;
         case handWinner of
             1: begin 
-                WriteLn('  >>> You won the hand!');
+                writeln('  >>> You won the hand!');
                     
                 gameManager.playerRoundPts := gameManager.playerRoundPts + 1;
                     
@@ -623,7 +623,7 @@ begin
             end;
             
             2: begin 
-                WriteLn('  >>> Computer won the hand!');
+                writeln('  >>> Computer won the hand!');
                     
                 gameManager.pcRoundPts := gameManager.pcRoundPts + 1;
                     
@@ -633,7 +633,7 @@ begin
                 firstToGo := 2;
             end;
             
-            0: WriteLn('  >>> Hand ended as a Tie!');
+            0: writeln('  >>> Hand ended as a Tie!');
         end;
             
         if round >= 2 then
@@ -643,19 +643,19 @@ begin
     if handWinner = 0 then
         handWinner := ChooseWinner(round);
         
-    WriteLn('');
-    WriteLn('  ====================================');
+    writeln;
+    writeln('  ====================================');
     if handWinner = 1 then
     begin
-        WriteLn('  YOU WON THI HAND!  +', handWeight, ' point(s)');
+        writeln('  YOU WON THIS HAND!  +', handWeight, ' point(s)');
         gameManager.playerMatchPts := gameManager.playerMatchPts + handWeight;
     end
     else
     begin
-        WriteLn('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
-        gameManager.pcRoundPts := gameManager.pcRoundPts + handWeight;
+        writeln('  COMPUTER WON THIS HAND!  +', handWeight, ' point(s)');
+        gameManager.pcMatchPts := gameManager.pcMatchPts + handWeight;
     end;
-    WriteLn('  ====================================');
+    writeln('  ====================================');
     
     gameManager.playerRoundPts := 0;
     gameManager.pcRoundPts := 0;
@@ -675,17 +675,17 @@ begin
   gameManager.pcRoundPts := 0;
   gameManager.pcRoundPts := 0;
 
-  WriteLn('==========================================');
-  WriteLn('            WELCOME TO TRUCO!             ');
-  WriteLn('==========================================');
-  WriteLn;
-  WriteLn('    Paus [P] > Copas [C] > Espadas [E] > Ouros [O]');
-  WriteLn;
-  WriteLn('  Card forces:');
-  WriteLn('    4 < 5 < 6 < 7 < J < Q < K < A < 2 < 3');
-  WriteLn;
-  WriteLn('  Press ENTER to initiate...');
-  ReadLn;
+  writeln('=======================================================');
+  writeln('                   WELCOME TO TRUCO!                   ');
+  writeln('=======================================================');
+  writeln;
+  writeln('    Clubs [C] > Hearts [H] > Spades [S] > Diamonds [D]');
+  writeln;
+  writeln(' > Card forces:');
+  writeln('    4 < 5 < 6 < 7 < J < Q < K < A < 2 < 3');
+  writeln;
+  writeln('  Press ENTER to initiate...');
+  readln;
 
   while (gameManager.playerMatchPts < 12) and (gameManager.pcMatchPts < 12) do
   begin
@@ -695,24 +695,24 @@ begin
 
     if (gameManager.playerMatchPts < 12) and (gameManager.pcMatchPts < 12) then
     begin
-      WriteLn('');
-      WriteLn('  Press ENTER for the next hand...');
-      ReadLn;
+      writeln;
+      writeln('  Press ENTER for the next hand...');
+      readln;
     end;
   end;
 
-  WriteLn('');
-  WriteLn('==========================================');
-  if PontosJogador >= 12 then
-    WriteLn('    CONGRATS! YOU WON THE GAME!')
+  writeln;
+  writeln('==========================================');
+  if gameManager.playerMatchPts >= 12 then
+    writeln('    CONGRATS! YOU WON THE GAME!')
   else
-    WriteLn('    COMPUTER WON! Try again.');
-  WriteLn('');
-  WriteLn('  Final score board:');
-  WriteLn('    You        : ', gameManager.playerMatchPts, ' points');
-  WriteLn('    Computer   : ', gameManager.pcMatchPts, ' points');
-  WriteLn('==========================================');
-  WriteLn('');
-  WriteLn('  Press any key to exit the program...');
-  ReadKey;
+    writeln('    COMPUTER WON! Try again.');
+  writeln;
+  writeln('  Final score board:');
+  writeln('    You        : ', gameManager.playerMatchPts, ' points');
+  writeln('    Computer   : ', gameManager.pcMatchPts, ' points');
+  writeln('==========================================');
+  writeln;
+  writeln('  Press any key to exit the program...');
+  readln;
 end.
