@@ -51,7 +51,7 @@ type Deck = array[0..deckSize-1] of TCard;
 
 {VARIÁVEIS}
 var 
-	d, suffled, Co: Deck;
+	initial, suffled, cutted: Deck;
     Position, Manilha: integer;
     Carta: TCard;
     player : TPlayer;
