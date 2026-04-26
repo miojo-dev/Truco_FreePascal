@@ -15,8 +15,8 @@ type TNameType
 }
 
 const
-    deckSize = 40;
-    handSize  = 3;
+    deckSize = 39;
+    handSize = 3;
 
 type	
     TSuit = (nClubs, nHearts, nSpades, nDiamonds);
@@ -40,25 +40,23 @@ type
 		
 		roundWeight: integer;
 		
-        playerRoundPts : double;
+        playerRoundPts : real;
         playerMatchPts : integer;
         
-        pcRoundPts : double;
+        pcRoundPts : real;
         pcMatchPts : integer;
 end;
 
-type Deck = array[0..deckSize-1] of TCard;
+type Deck = array[0..deckSize] of TCard;
 
 {VARIÁVEIS}
 var 
-	initial, suffled, cutted: Deck;
-    Position, Manilha: integer;
+	initial, shuffled, cutted: Deck;
+    position, Manilha: integer;
     Carta: TCard;
     player : TPlayer;
     pc : TPlayer;
 	gameManager: TGame;
-
-{TODO: list, queue and stack}
 
 { ===== Utils ===== }
 
@@ -95,16 +93,16 @@ end;
 function FaceStr(card : integer) : string;
 begin
     case card of
-        1 : FaceStr := 'A ';
-        10 : FaceStr := 'J ';
-        11 : FaceStr := 'Q ';
-        12 : FaceStr := 'K ';
-        else FaceStr := IntToStr(card) + ' ';
+        1 : FaceStr := 'A';
+        10 : FaceStr := 'J';
+        11 : FaceStr := 'Q';
+        12 : FaceStr := 'K';
+        else FaceStr := IntToStr(card);
     end;
 end;
 
 {formats the card into a stringwith all the info}
-function CardStr(const c: TCard): string;
+function CardStr(var c: TCard): string;
 begin
     CardStr := FaceStr(c.weight) + ' of ' + SuitStr(c.suit);
     
@@ -123,7 +121,7 @@ begin
 end;
 
 {total force of the card}
-function TotalCardForce(const c: TCard): integer;
+function TotalCardForce(var c: TCard): integer;
 begin
     if c.isManilha then
     begin
@@ -136,12 +134,12 @@ begin
 end;
 
 {next card in the sequence}
-function NextCardweight(v: integer): integer;
+function NextCardWeight(v: integer): integer;
 begin
     case v of
-        7 : NextCardweight :=  10;
-        12 : NextCardweight := 1;
-        else NextCardweight := v + 1;
+        7 : NextCardWeight :=  10;
+        12 : NextCardWeight := 1;
+        else NextCardWeight := v + 1;
     end;
 end;
 
@@ -153,7 +151,7 @@ end;
 2 = pc won
 0 = tie
 }
-function CompareCards(const playerCards, pcCards: TCard): integer;
+function CompareCards(var playerCards, pcCards: TCard): integer;
 var playerPower, pcPower, sum: integer;
 begin
     playerPower := TotalCardForce(playerCards);
@@ -184,12 +182,12 @@ begin
 	begin
 		for k := 1 to 12 do
         begin
-        if (k < 8) or (k > 9) then
+        if (k <> 8) and (k <> 9) then
         begin
             d[i].suit := suit[j];
-            
 			d[i].weight := k;
-            d[i].isDrew:= false;      
+            d[i].isDrew:= false;
+            d[i].isManilha:=false;
 			i:= i + 1;
 			end;
 		end;
@@ -202,7 +200,7 @@ procedure ShuffleDeck(var d, e:Deck; ds:integer);
 var i, n: integer;
 begin
  i:=0;
- while i <= ds-1 do
+ while i <= ds do
   begin
    n:= random(40);
    if (d[n].isDrew = false) then
@@ -220,7 +218,7 @@ var i, c, j:integer;
 begin
  c:= random(40);
  i:=0;
- for j:=c to ds-1 do
+ for j:=c to ds do
   begin
    f[i]:= e[j];
    i:=i+1;
@@ -238,33 +236,31 @@ function BuyCard(var f:Deck; var p:integer):TCard;
 var i:integer;
 begin
  BuyCard:=f[0];
- p:= p-1;
+ 
  for i:= 0 to p-1 do
     f[i] := f[i+1];
+    
+ p:= p-1;
 end;
 
 //FUNÇÃO COMPRA UMA CARTA E DEFINE A MANILHA
-function ViraManilha(f:Deck; var p:integer ): integer;
-var Manilha:TCard;
-Valor:integer;
+procedure DefineManilha(var f:Deck; var p:integer);
 begin
-    Manilha:= BuyCard(f,p);
-    Valor:= NextCardweight(Manilha.weight);
-    ViraManilha:= Valor;
-    writeln('===================');
-    writeln('THE MANILHA IS: ', Valor);
-    writeln('===================');
+    gameManager.turnedCard := BuyCard(f,p);
+    
+    gameManager.currentManilha:= NextCardWeight(gameManager.turnedCard.weight);
+    
 end;
 
 //FUNÇÃO PARA JOGAR AS CARTAS PARA CADA JOGADOR
-procedure Distribuir_Carta(var f:Deck; var PL, PC:TPlayer; var p:integer);
+procedure DealCards(var f:Deck; var PL, PC:TPlayer; var p:integer);
 var i, ipl, ipc:integer;
 begin
  ipl:=1;
  ipc:=1;
  for i:=1 to 6 do
  begin
-  if i mod 2 = 0 then
+  if i mod 2 <> 0 then
    begin
     PL.hand[ipl]:= BuyCard(f,p);
     ipl:= ipl + 1;
@@ -278,7 +274,7 @@ begin
 end;
 
 //FUNCAO PARA VERIFICAR SE ALGUÉM DOS JOGADORES POSSUI MANILHA
-procedure Verifica_Manilha(var P:TPlayer);
+procedure VerifyManilhaHand(var P:TPlayer);
 var i:integer;
 begin
  for i:=1 to 3 do
@@ -287,6 +283,7 @@ begin
   else 
    P.hand[i].isManilha := False;
 end;
+
 //RESETA O IS DREW PARA PODER EMBARALHAR NORMALMENTE.
 procedure ResetDeck(var d: Deck);
 var
@@ -298,53 +295,77 @@ end;
 
 { == Game Logic === }
     
-procedure ShowPlayerHand(const hand: array of TCard);
+procedure ShowPlayerHand(H: TPlayer);
 var i : integer;
 begin
     writeln;
-    
+        
     for i := 1 to 3 do
-    begin
-        if hand[i].isDrew = false then
         begin
-            writeln(' - [', i, '] ', CardStr(hand[i]));
-        end;
-    end;
+            if H.hand[i].weight = gameManager.CurrentManilha then
+                writeln(' - [', i, '] ', H.hand[i].weight,
+                    ' of ', SuitStr(H.hand[i].suit),'  **MANILHA**')
+                
+            else
+                writeln(' - [', i, '] ', H.hand[i].weight,
+                    ' of ', SuitStr(H.hand[i].suit));
+     end;
+end;
+
+procedure esc(d:Deck; p:integer);
+var i:integer;
+begin
+ for i:= 0 to p do
+  writeln('Card in position ',i,' ', d[i].weight,' of ',SuitStr(d[i].suit));
+ writeln;
+end;
+
+procedure PrepareHands;
+begin
+    GenerateDeck(initial, deckSize, position);
+    ShuffleDeck(initial, shuffled, deckSize);
+    Cut(shuffled, cutted, deckSize);
+    DealCards(cutted, player, pc, position);
+    DefineManilha(cutted, position);
+    //ShowPlayerHand(player);
+    
+    VerifyManilhaHand(player);
+    VerifyManilhaHand(pc);
 end;
 
 procedure ShowScore;
 begin
     writeln;
     writeln('Score match >> Player: ', gameManager.playerMatchPts,
-	' | PC: ', gameManager.pcMatchPts);
+	    ' | PC: ', gameManager.pcMatchPts);
     writeln;
     writeln('Score round >> Player: ', gameManager.playerRoundPts:0:0,
-	' | PC: ', gameManager.pcRoundPts:0:0);
+	    ' | PC: ', gameManager.pcRoundPts:0:0);
 	writeln;
 end;
 
-function ChoosePCcard(var round: integer) : integer;
+function ChoosePCcard(var round: integer) : TCard;
 var i, currentCard : integer;
     high, low, mid : TCard;
 begin
     high.weight := 0;
-    low.weight := pc.hand[1].weight;
+    low := pc.hand[1];
     
     for i := 1 to 2 do
     begin
         currentCard := TotalCardForce(pc.hand[i]);
         
-        if currentCard > TotalCardForce(high) then high.weight := pc.hand[i].weight
+        if currentCard > TotalCardForce(high) then high := pc.hand[i]
         
-        else if currentCard < TotalCardForce(low) then low.weight := pc.hand[i].weight
+        else if currentCard < TotalCardForce(low) then low := pc.hand[i]
         
-        else mid.weight := pc.hand[i].weight;
+        else mid := pc.hand[i];
     end;
     
     case round of
-        1: ChoosePCcard := high.weight;
-        2: ChoosePCcard := low.weight;
-        3: ChoosePCcard := mid.weight;
+        1: ChoosePCcard := high;
+        2: ChoosePCcard := low;
+        3: ChoosePCcard := mid;
     end;
 end;
 
@@ -354,7 +375,7 @@ end;
     2 = pc Won
 }
 function ChooseWinner(round: byte): byte;
-var diff: double;
+var diff: real;
 begin
     diff := gameManager.playerRoundPts - gameManager.pcRoundPts;
     
@@ -406,63 +427,62 @@ begin
                 writeln('Now the hand is worth ', nextWeight);
                 
                 NegotiateTruco := nextWeight;
+            end
+            else
+            begin
+                writeln('  Computer  RAN AWAY! You won! ', currentWeight, ' points(s).');
+                NegotiateTruco := -currentWeight;
             end;
         end
         else
         begin
-            writeln('  Computer  RAN AWAY! You won! ', currentWeight, ' points(s).');
-            NegotiateTruco := -currentWeight;
-        end;
-      end
-      else
-      begin
-        {Computer called}
-        case nextWeight of
-          3 : writeln('  >> Computer called TRUCO!  (proposal: 3 points)');
-          6 : writeln('  >> Computer called for SIX!  (proposal: 6 points)');
-          9 : writeln('  >> Computer called for NINE!  (proposal: 9 points)');
-          12: writeln('  >> Computer called for TWELVE!  (proposal: 12 points)');
-        end;
-        
-        writeln('  What do you do?');
-        writeln('    > 1 - Accept  (', nextWeight, ' points)');
-        
-        writeln('    > 2 - Run   (computer wins ', currentWeight, ' point(s))');
-        
-        if nextWeight < 12 then
-            writeln('    > 3 - Call for more (call for ', nextWeight + 3, ' points)');
-            
-        repeat
-            write('  Your choice: ');
-            readln(choice);
-        until (choice = 1) or (choice = 2) or (choice = 3);
-    
-        case choice of
-            1:
-            begin
-                writeln('  You accept! now this hand worth: ', nextWeight, ' points.');
-                NegotiateTruco := nextWeight;
+            {Computer called}
+            case nextWeight of
+              3 : writeln('  >> Computer called TRUCO!  (proposal: 3 points)');
+              6 : writeln('  >> Computer called for SIX!  (proposal: 6 points)');
+              9 : writeln('  >> Computer called for NINE!  (proposal: 9 points)');
+              12: writeln('  >> Computer called for TWELVE!  (proposal: 12 points)');
             end;
             
-            2:
-            begin
-                writeln('  You ran away! Computer won ', currentWeight, ' point(s).');
-                NegotiateTruco := -currentWeight;
-            end;
+            writeln('  What do you do?');
+            writeln('    > 1 - Accept  (', nextWeight, ' points)');
+            writeln('    > 2 - Run   (computer wins ', currentWeight, ' point(s))');
             
-            3:
-            begin
-                writeln('  You re-called! Asked for ', nextWeight + 3, ' points...');
+            if nextWeight < 12 then
+                writeln('    > 3 - Call for more (call for ', nextWeight + 3, ' points)');
                 
-                if Random(10) <= 5 then
+            repeat
+                write('  Your choice: ');
+                readln(choice);
+            until (choice = 1) or (choice = 2) or (choice = 3);
+                
+            case choice of
+                1:
                 begin
-                    writeln('  Computer ACCEPTED the re-call! now this hand worth: ', nextWeight + 3, ' points.');
-                    NegotiateTruco := nextWeight + 3;
-                end
-                else
+                    writeln('  You accept! now this hand worth: ', nextWeight, ' points.');
+                    NegotiateTruco := nextWeight;
+                end;
+                
+                2:
                 begin
-                    writeln('  Computer RAN AWAY from the re-call! You won ', nextWeight, ' point(s).');
-                    NegotiateTruco := -nextWeight;
+                    writeln('  You ran away! Computer won ', currentWeight, ' point(s).');
+                    NegotiateTruco := -currentWeight;
+                end;
+                
+                3:
+                begin
+                    writeln('  You re-called! Asked for ', nextWeight + 3, ' points...');
+                    
+                    if Random(10) <= 5 then
+                    begin
+                        writeln('  Computer ACCEPTED the re-call! now this hand worth: ', nextWeight + 3, ' points.');
+                        NegotiateTruco := nextWeight + 3;
+                    end
+                    else
+                    begin
+                        writeln('  Computer RAN AWAY from the re-call! You won ', nextWeight, ' point(s).');
+                        NegotiateTruco := -nextWeight;
+                    end;
                 end;
             end;
         end;
@@ -471,7 +491,7 @@ end;
 
 {plays one hand (3 rounds).
 return 1 if player won, 2 if pc won}
-function PlayHand: Integer;
+function PlayHand: integer;
 var
     handWinner, handWeight, resp, round, IdxP, IdxC, firstToGo : Integer;
     cardPlayer, cardPc : TCard;
@@ -483,7 +503,9 @@ begin
     firstToGo := 1 + Random(2);
     handWinner := 0;
     
-    clrscr;
+    PrepareHands;
+    
+    //clrscr;
     writeln;
     writeln('========================================');
     writeln('             NEW HAND                   ');
@@ -502,7 +524,7 @@ begin
         writeln('  If you win the round you win the match! If you lose, the opponent receives 3 points.');
         writeln;
         writeln('  Turned card: ', CardStr(gameManager.turnedCard));
-        ShowPlayerHand(player.hand);
+        ShowPlayerHand(player);
         writeln;
         writeln('  You want to play this hand?');
         writeln('       y?  or  n?');
@@ -537,7 +559,7 @@ begin
         writeln;
         writeln('========================================');
         writeln('  -------- round: ', round, ' --------');
-        ShowPlayerHand(player.hand);
+        ShowPlayerHand(player);
         ShowScore;
         
         { Computer can call Truco before the player (30% chance) }
@@ -582,7 +604,7 @@ begin
             
             handWeight := resp;
             isOnTruco := True;
-            ShowPlayerHand(player.hand);
+            ShowPlayerHand(player);
         end
         else
         begin
@@ -598,7 +620,7 @@ begin
         player.hand[IdxP].isDrew := true;
         
         {Computer chooses}
-        IdxC := ChoosePCcard(round);
+        IdxC := ChoosePCcard(round).weight;
         pc.hand[IdxC].isDrew := true;
         
         cardPlayer := player.hand[IdxP];
@@ -636,6 +658,8 @@ begin
             0: writeln('  >>> Hand ended as a Tie!');
         end;
             
+        ResetDeck(initial);
+            
         if round >= 2 then
             handWinner := ChooseWinner(round);
     end;
@@ -663,17 +687,14 @@ begin
     PlayHand := handWinner;
 end;
 
-procedure PrepareHand;
-begin
-    {todo implementar funções de inicialização}
-end;
-
 {implementation}
 begin
-  gameManager.pcMatchPts := 0;
-  gameManager.pcMatchPts := 0;
-  gameManager.pcRoundPts := 0;
-  gameManager.pcRoundPts := 0;
+    Randomize;
+
+    gameManager.pcMatchPts := 0;
+    gameManager.pcMatchPts := 0;
+    gameManager.pcRoundPts := 0;
+    gameManager.pcRoundPts := 0;
 
   writeln('=======================================================');
   writeln('                   WELCOME TO TRUCO!                   ');
@@ -689,8 +710,7 @@ begin
 
   while (gameManager.playerMatchPts < 12) and (gameManager.pcMatchPts < 12) do
   begin
-    PrepareHand;
-    PlayHand;
+    PlayHand();
     ShowScore;
 
     if (gameManager.playerMatchPts < 12) and (gameManager.pcMatchPts < 12) then
