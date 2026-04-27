@@ -397,6 +397,10 @@ begin
         
         else if diff = -1 then ChooseWinner := 2  { R1 tie, R2 PC }
         
+        else if diff = 1.5 then ChooseWinner := 1   { player won R1, R2 tie }
+        
+        else if diff = -1.5 then ChooseWinner := 2  { PC won R1, R2 tie }
+        
         else ChooseWinner := 0;
     end
 end;
