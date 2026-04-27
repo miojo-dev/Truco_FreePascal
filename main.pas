@@ -381,22 +381,24 @@ begin
     
     if round = 3 then
     begin
+        if diff > 0 then ChooseWinner := 1
         
-        if diff = 0.5 then ChooseWinner := 1
-        
-        else if diff = -0.5  then ChooseWinner := 2
+        else if diff < 0 then ChooseWinner := 2
         
         else ChooseWinner := 0;
-    end 
+    end
     else if round = 2 then
     begin
+        if diff = 2.5 then ChooseWinner := 1     { won R1 e R2 }
         
-        if diff = 2.5 then ChooseWinner := 1
+        else if diff = -2.5 then ChooseWinner := 2
         
-        else if diff = -2.5  then ChooseWinner := 2
+        else if diff = 1 then ChooseWinner := 1   { R1 tie, R2 player }
+        
+        else if diff = -1 then ChooseWinner := 2  { R1 tie, R2 PC }
         
         else ChooseWinner := 0;
-    end;
+    end
 end;
 
 function NegotiateTruco(currentWeight, whoCalled : integer; var winner: integer) : integer;
